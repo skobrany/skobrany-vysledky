@@ -1,0 +1,182 @@
+<title>Obřany Výsledky</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* layout: stacked list of match rows grouped under two headings, with a sticky club-green header */
+:root{
+  --bg:#f6f8f6; --surface:#ffffff; --border:#dfe6df;
+  --green:#1c6b32; --green-dark:#154f26; --text:#1c2420; --muted:#6b7a6f;
+  --us:#12421f; --score:#1c6b32; --vs:#9aa89d;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#10150f; --surface:#171d16; --border:#283428;
+    --green:#3fae63; --green-dark:#2f8a4d; --text:#e7ede6; --muted:#8fa090;
+    --us:#7adba0; --score:#5fc985; --vs:#5d6b60;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#10150f; --surface:#171d16; --border:#283428;
+  --green:#3fae63; --green-dark:#2f8a4d; --text:#e7ede6; --muted:#8fa090;
+  --us:#7adba0; --score:#5fc985; --vs:#5d6b60;
+}
+*{box-sizing:border-box}
+html,body{background:var(--bg)}
+body{
+  color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  padding-left:max(16px, env(safe-area-inset-left,0px));
+  padding-right:max(16px, env(safe-area-inset-right,0px));
+}
+body::before{
+  content:""; position:fixed; inset:0 0 auto; height:env(safe-area-inset-top,0px);
+  z-index:10; background:var(--green-dark);
+}
+header.top{
+  position:sticky; top:env(safe-area-inset-top,0px); z-index:5;
+  background:var(--green-dark); color:#fff; margin:0 -16px;
+  padding:14px max(16px, env(safe-area-inset-left,0px)) 14px max(16px, env(safe-area-inset-right,0px));
+  display:flex; align-items:baseline; justify-content:space-between; gap:8px; flex-wrap:wrap;
+}
+header.top h1{font-size:1.15rem; margin:0; letter-spacing:.02em}
+header.top .src{font-size:.72rem; opacity:.85}
+main{max-width:640px; margin:0 auto; padding-bottom:40px}
+.updated{font-size:.82rem; color:var(--muted); margin:14px 0 20px}
+.block-title{
+  font-size:1.05rem; font-weight:700; color:var(--green);
+  border-bottom:2px solid var(--green); padding-bottom:6px; margin:0 0 4px;
+}
+.upcoming-header{
+  display:flex; flex-wrap:wrap; align-items:baseline; justify-content:space-between; gap:8px;
+  border-bottom:2px solid var(--green); padding-bottom:6px; margin:0 0 4px;
+}
+.upcoming-header .block-title{border-bottom:none; margin:0; padding-bottom:0}
+.week-nav{display:flex; align-items:center; gap:10px}
+.week-nav button{
+  background:var(--green); color:#fff; border:none; border-radius:6px;
+  width:2em; height:2em; font-size:1.1em; line-height:1; cursor:pointer;
+}
+.week-nav button:active{opacity:.8}
+.week-label{font-size:.82rem; color:var(--muted); min-width:11em; text-align:center}
+.list{background:var(--surface); border:1px solid var(--border); border-radius:12px; overflow:hidden; margin-bottom:28px}
+.row{display:flex; flex-wrap:wrap; align-items:baseline; gap:4px 12px; padding:11px 14px; border-top:1px solid var(--border)}
+.row:first-child{border-top:none}
+.cat{font-weight:600; min-width:100%; font-size:.78rem; color:var(--muted); text-transform:uppercase; letter-spacing:.03em}
+.match{flex-grow:1; min-width:0; font-size:.98rem}
+.us{font-weight:700; color:var(--us)}
+.score{font-weight:700; color:var(--score); font-variant-numeric:tabular-nums; margin:0 2px}
+.vs{color:var(--vs); margin:0 2px}
+.date{font-size:.78rem; color:var(--muted); margin-left:auto; white-space:nowrap}
+.empty{color:var(--muted); font-size:.85rem; font-style:italic}
+footer.note{font-size:.72rem; color:var(--muted); text-align:center; padding:10px 0 20px}
+</style>
+
+<header class="top">
+  <h1>⚽ SK Obřany</h1>
+  <span class="src">zdroj: skobrany.cz</span>
+</header>
+
+<main>
+  <p class="updated" id="updated"></p>
+
+  <div class="block-title">Poslední zápasy</div>
+  <div class="list" id="last-list"></div>
+
+  <div class="upcoming-header">
+    <div class="block-title">Zápasy v týdnu</div>
+    <div class="week-nav">
+      <button id="prev" aria-label="Předchozí týden">‹</button>
+      <span class="week-label" id="week-label"></span>
+      <button id="next" aria-label="Další týden">›</button>
+    </div>
+  </div>
+  <div class="list" id="week-list"></div>
+
+  <footer class="note">Data jsou snímek z skobrany.cz (ne živá). Pro aktualizaci požádej o obnovení. Na iPhonu: Safari → Sdílet → Přidat na plochu.</footer>
+</main>
+
+<script type="application/json" id="sko-data">[{"name":"Muži A","matches":[{"home":"Obřany","away":"Slatina B","score":"2:1","date":"2026-08-15T08:00:00.000Z"},{"home":"MCV","away":"Obřany","score":"4:4","date":"2026-08-23T14:30:00.000Z"},{"home":"Obřany","away":"Soběšice B","score":"4:2","date":"2026-08-30T14:30:00.000Z"},{"home":"Obřany","away":"Řečkovice","score":"1:1","date":"2026-09-06T14:00:00.000Z"},{"home":"Chrlice","away":"Obřany","score":"2:7","date":"2026-09-13T14:30:00.000Z"},{"home":"Obřany","away":"Jundrov","score":"5:2","date":"2026-09-20T13:30:00.000Z"},{"home":"Bystrc B","away":"Obřany","score":"2:4","date":"2026-09-26T13:30:00.000Z"},{"home":"Obřany","away":"Medlánky B","score":"4:2","date":"2026-10-03T13:00:00.000Z"},{"home":"Kohoutovice B","away":"Obřany","score":"5:2","date":"2026-10-10T11:30:00.000Z"},{"home":"Obřany","away":"Bosonohy B","score":"4:4","date":"2026-10-18T12:30:00.000Z"},{"home":"MS Brno","away":"Obřany","score":"2:1","date":"2026-10-25T13:30:00.000Z"},{"home":"St. Lískovec","away":"Obřany","score":null,"date":"2026-10-31T13:00:00.000Z"},{"home":"Obřany","away":"Bílovice n. Svit.","score":null,"date":"2026-11-07T13:00:00.000Z"}]},{"name":"Dorost","matches":[{"home":"Lelekovice","away":"Obřany","score":"1:1","date":"2026-08-23T11:45:00.000Z"},{"home":"Obřany","away":"Soběšice B","score":"5:1","date":"2026-08-30T11:30:00.000Z"},{"home":"Obřany","away":"Řečkovice B","score":"6:0","date":"2026-09-06T11:00:00.000Z"},{"home":"Obřany","away":"Řícmanice B","score":"2:0","date":"2026-09-15T15:00:00.000Z"},{"home":"Obřany","away":"Jundrov","score":"4:2","date":"2026-09-20T10:30:00.000Z"},{"home":"Křižanovice","away":"Obřany","score":"0:11","date":"2026-09-22T16:00:00.000Z"},{"home":"Račice/Bukovinka","away":"Obřany","score":"4:0","date":"2026-09-26T08:00:00.000Z"},{"home":"Obřany","away":"Žebětín","score":"4:2","date":"2026-10-04T12:00:00.000Z"},{"home":"Tuřany/Slatina","away":"Obřany","score":"3:4","date":"2026-10-10T08:30:00.000Z"},{"home":"Obřany","away":"Kohoutovice B","score":"8:0","date":"2026-10-18T09:30:00.000Z"},{"home":"Slovan  B","away":"Obřany","score":"2:4","date":"2026-10-24T09:15:00.000Z"},{"home":"Obřany","away":"MS Brno A","score":null,"date":"2026-11-01T12:00:00.000Z"},{"home":"MS Brno B","away":"Obřany","score":null,"date":"2026-11-08T12:00:00.000Z"},{"home":"Obřany","away":"St. Lískovec","score":null,"date":"2026-11-14T13:00:00.000Z"}]},{"name":"Starší žáci","matches":[{"home":"Lipovec/FSA Kras","away":"Obřany","score":"0:9","date":"2026-08-28T15:45:00.000Z"},{"home":"Obřany","away":"Černá Hora","score":"0:0","date":"2026-09-05T07:00:00.000Z"},{"home":"Blansko B","away":"Obřany","score":"4:7","date":"2026-09-12T11:00:00.000Z"},{"home":"Obřany","away":"Olomučany/Babice","score":"3:0","date":"2026-09-20T07:00:00.000Z"},{"home":"Vysočany - Šošůvka/Vavřinec","away":"Obřany","score":"1:5","date":"2026-09-26T08:00:00.000Z"},{"home":"Bořitov/ŽH","away":"Obřany","score":"2:4","date":"2026-10-07T14:30:00.000Z"},{"home":"Obřany","away":"RDR Akademie B","score":"9:1","date":"2026-10-10T07:00:00.000Z"},{"home":"Obřany","away":"Černá Hora","score":"8:0","date":"2026-10-13T15:30:00.000Z"},{"home":"Knínice/ŽH","away":"Obřany","score":"1:5","date":"2026-10-18T08:00:00.000Z"},{"home":"Obřany","away":"Ostrov/Vysočany-Šošůvka","score":"16:0","date":"2026-10-25T08:00:00.000Z"},{"home":"Černá Hora","away":"Obřany","score":null,"date":"2026-10-28T10:45:00.000Z"},{"home":"Obřany","away":"Lipovec/FSA Kras","score":null,"date":"2026-11-01T08:00:00.000Z"}]},{"name":"Starší žáci sk. B","matches":[{"home":"Rosice \"B\"","away":"Obřany","score":"0:17","date":"2026-08-30T12:30:00.000Z"},{"home":"Lažánky","away":"Obřany","score":"1:3","date":"2026-09-06T12:00:00.000Z"},{"home":"Obřany","away":"Troubsko","score":"5:0","date":"2026-09-13T07:00:00.000Z"},{"home":"Popůvky","away":"Obřany","score":"2:5","date":"2026-09-19T07:00:00.000Z"},{"home":"Obřany","away":"Drásov","score":"6:1","date":"2026-09-27T08:00:00.000Z"},{"home":"Kahan","away":"Obřany","score":"2:2","date":"2026-10-04T07:00:00.000Z"},{"home":"Obřany","away":"Říčany","score":"0:0","date":"2026-10-11T07:00:00.000Z"},{"home":"Obřany","away":"Oslavany","score":"1:9","date":"2026-10-18T07:00:00.000Z"},{"home":"Střelice","away":"Obřany","score":"7:1","date":"2026-10-24T09:00:00.000Z"}]},{"name":"Mladší žáci sk. A","matches":[{"home":"Lipovec/FSA Kras","away":"Obřany","score":"4:6","date":"2026-08-28T14:00:00.000Z"},{"home":"Obřany","away":"Černá Hora","score":"19:1","date":"2026-09-05T09:00:00.000Z"},{"home":"Blansko B","away":"Obřany","score":"0:20","date":"2026-09-12T13:00:00.000Z"},{"home":"Vavřinec/Vysočany-Šošůvka","away":"Obřany","score":"0:8","date":"2026-09-26T13:00:00.000Z"},{"home":"Babice/Adamov","away":"Obřany","score":"0:15","date":"2026-10-03T08:00:00.000Z"},{"home":"RDR Akademie dívky","away":"Obřany","score":"4:7","date":"2026-10-17T12:00:00.000Z"},{"home":"Obřany","away":"Lipůvka","score":"4:1","date":"2026-10-25T10:00:00.000Z"},{"home":"Obřany","away":"RDR Akademie B","score":"3:0","date":"2026-10-25T12:00:00.000Z"},{"home":"Obřany","away":"Blansko B","score":null,"date":"2026-10-28T08:00:00.000Z"},{"home":"Obřany","away":"Lipovec/FSA Kras","score":null,"date":"2026-11-01T10:00:00.000Z"},{"home":"Černá Hora","away":"Obřany","score":null,"date":"2026-11-07T09:00:00.000Z"}]},{"name":"Mladší žáci sk. B","matches":[{"home":"Obřany","away":"Kupařovice/D. Kounice","score":"14:3","date":"2026-08-26T15:30:00.000Z"},{"home":"Lažánky","away":"Obřany","score":"0:4","date":"2026-08-30T12:00:00.000Z"},{"home":"Tišnov \"B\"","away":"Obřany","score":"1:6","date":"2026-09-02T15:00:00.000Z"},{"home":"Obřany","away":"Říčany","score":"5:4","date":"2026-09-13T09:00:00.000Z"},{"home":"Kuřim \"B\"","away":"Obřany","score":"0:11","date":"2026-09-19T07:00:00.000Z"},{"home":"Oslavany","away":"Obřany","score":"1:6","date":"2026-10-04T08:00:00.000Z"},{"home":"Obřany","away":"Popůvky","score":"5:3","date":"2026-10-06T14:00:00.000Z"},{"home":"Obřany","away":"Kahan \"A\"","score":"4:1","date":"2026-10-11T09:00:00.000Z"},{"home":"Kahan \"B\"","away":"Obřany","score":"0:8","date":"2026-10-17T08:00:00.000Z"},{"home":"Obřany","away":"D. Loučky","score":"1:2","date":"2026-10-24T12:00:00.000Z"},{"home":"Obřany","away":"Střelice","score":null,"date":"2026-10-31T13:00:00.000Z"},{"home":"Drásov","away":"Obřany","score":null,"date":"2026-11-07T09:00:00.000Z"}]},{"name":"Starší přípravka sk. B","matches":[{"home":"Obřany A","away":"Medlánky A","score":"9:8","date":"2026-09-06T07:00:00.000Z"},{"home":"Žebětín A","away":"Obřany A","score":"13:7","date":"2026-09-13T13:00:00.000Z"},{"home":"Soběšice","away":"Obřany A","score":"8:11","date":"2026-09-18T14:30:00.000Z"},{"home":"Obřany A","away":"St. Lískovec B","score":"15:8","date":"2026-09-27T11:00:00.000Z"},{"home":"Bystrc B","away":"Obřany A","score":"11:5","date":"2026-10-02T14:30:00.000Z"},{"home":"Řečkovice B","away":"Obřany A","score":"4:12","date":"2026-10-07T14:30:00.000Z"},{"home":"Obřany A","away":"Artis U9 S","score":"8:6","date":"2026-10-11T11:00:00.000Z"},{"home":"Artis U10 L","away":"Obřany A","score":"7:7","date":"2026-10-18T13:00:00.000Z"},{"home":"Obřany A","away":"Slatina A","score":"7:6","date":"2026-10-24T07:00:00.000Z"},{"home":"Obřany A","away":"Lokomotiva A","score":null,"date":"2026-11-01T14:00:00.000Z"},{"home":"Slovan A","away":"Obřany A","score":null,"date":"2026-11-07T14:30:00.000Z"}]},{"name":"Starší přípravka sk. D","matches":[{"home":"Obřany B","away":"Medlánky B","score":"6:9","date":"2026-09-06T09:00:00.000Z"},{"home":"Žebětín B","away":"Obřany B","score":"9:13","date":"2026-09-13T08:00:00.000Z"},{"home":"Lelekovice B","away":"Obřany B","score":"10:4","date":"2026-09-20T08:00:00.000Z"},{"home":"Obřany B","away":"MS Brno B","score":"6:7","date":"2026-09-27T13:00:00.000Z"},{"home":"MCV","away":"Obřany B","score":"3:11","date":"2026-10-02T14:30:00.000Z"},{"home":"Chrlice B","away":"Obřany B","score":"8:7","date":"2026-10-07T14:30:00.000Z"},{"home":"Obřany B","away":"Bílovice n. Svit.","score":"7:13","date":"2026-10-11T13:00:00.000Z"},{"home":"Bosonohy/N. Lískovec","away":"Obřany B","score":"16:5","date":"2026-10-16T14:00:00.000Z"},{"home":"Obřany B","away":"Slatina B","score":"12:5","date":"2026-10-24T09:00:00.000Z"},{"home":"Obřany B","away":"Lokomotiva B","score":null,"date":"2026-10-28T10:00:00.000Z"},{"home":"Slovan B","away":"Obřany B","score":null,"date":"2026-11-08T14:30:00.000Z"}]},{"name":"Mladší přípravka sk. A","matches":[{"home":"Obřany A","away":"St. Lískovec A","score":"23:7","date":"2026-09-05T13:00:00.000Z"},{"home":"Obřany B","away":"Obřany A","score":"7:26","date":"2026-09-11T14:30:00.000Z"},{"home":"Obřany A","away":"Bystrc A","score":"20:10","date":"2026-09-19T07:00:00.000Z"},{"home":"Obřany A","away":"Sparta B","score":"9:20","date":"2026-09-23T14:30:00.000Z"},{"home":"Bystrc B","away":"Obřany A","score":"18:18","date":"2026-09-25T14:30:00.000Z"},{"home":"Obřany A","away":"Artis U9S B","score":"18:15","date":"2026-10-04T07:00:00.000Z"},{"home":"Artis U9 L","away":"Obřany A","score":"10:16","date":"2026-10-11T13:30:00.000Z"},{"home":"Obřany A","away":"Start A","score":"10:20","date":"2026-10-17T07:00:00.000Z"},{"home":"Start B","away":"Obřany A","score":"7:27","date":"2026-10-25T09:45:00.000Z"},{"home":"Obřany A","away":"Sparta A","score":null,"date":"2026-11-08T08:00:00.000Z"}]},{"name":"Mladší přípravka sk. A (B)","matches":[{"home":"Obřany B","away":"Obřany A","score":"7:26","date":"2026-09-11T14:30:00.000Z"},{"home":"St. Lískovec A","away":"Obřany B","score":"24:4","date":"2026-09-19T08:00:00.000Z"},{"home":"Obřany B","away":"Sparta A","score":"0:0","date":"2026-09-23T14:30:00.000Z"},{"home":"Obřany B","away":"Sparta B","score":"8:24","date":"2026-09-25T14:30:00.000Z"},{"home":"Obřany B","away":"Bystrc A","score":"9:20","date":"2026-10-04T07:00:00.000Z"},{"home":"Bystrc B","away":"Obřany B","score":"16:24","date":"2026-10-09T14:15:00.000Z"},{"home":"Obřany B","away":"Artis U9S B","score":"19:3","date":"2026-10-17T07:00:00.000Z"},{"home":"Artis U9 L","away":"Obřany B","score":"10:5","date":"2026-10-25T14:00:00.000Z"},{"home":"Start B","away":"Obřany B","score":null,"date":"2026-11-01T09:30:00.000Z"},{"home":"Obřany B","away":"Start A","score":null,"date":"2026-11-08T08:00:00.000Z"}]},{"name":"Mladší přípravka sk. C","matches":[{"home":"Obřany C","away":"MS Brno","score":"20:13","date":"2026-09-05T13:00:00.000Z"},{"home":"Jundrov","away":"Obřany C","score":"19:10","date":"2026-09-11T14:30:00.000Z"},{"home":"Obřany C","away":"Lelekovice","score":"5:18","date":"2026-09-23T14:30:00.000Z"},{"home":"Ochoz","away":"Obřany C","score":"3:26","date":"2026-09-27T08:45:00.000Z"},{"home":"Obřany C","away":"Bohunice","score":"7:30","date":"2026-10-04T07:00:00.000Z"},{"home":"ČAFC","away":"Obřany C","score":"16:11","date":"2026-10-09T14:00:00.000Z"},{"home":"Obřany C","away":"Slatina","score":"6:13","date":"2026-10-17T07:00:00.000Z"},{"home":"Žebětín B","away":"Obřany C","score":"6:25","date":"2026-10-25T08:00:00.000Z"},{"home":"Bílovice n. Svit.","away":"Obřany C","score":null,"date":"2026-11-04T14:45:00.000Z"},{"home":"Obřany C","away":"Soběšice","score":null,"date":"2026-11-08T08:00:00.000Z"}]}]</script>
+
+<script>
+(function(){
+  var SNAPSHOT_AT = 'Ne 25. 10. 2026 19:00';
+  var DATA = JSON.parse(document.getElementById('sko-data').textContent);
+  var DAY_NAMES = ['Ne','Po','Út','St','Čt','Pá','So'];
+
+  document.getElementById('updated').textContent = 'Snímek dat: ' + SNAPSHOT_AT + ' (zdroj: IS FAČR via skobrany.cz)';
+
+  function pad(n){ return String(n).padStart(2,'0'); }
+  function fmtDate(d){ return pad(d.getDate())+'.'+pad(d.getMonth()+1)+'.'; }
+  function fmtDateTime(d){ return DAY_NAMES[d.getDay()]+' '+pad(d.getDate())+'.'+pad(d.getMonth()+1)+'. '+pad(d.getHours())+':'+pad(d.getMinutes()); }
+  function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  function teamSpan(name){
+    var isUs = name.indexOf('Obřany') === 0;
+    return '<span class="'+(isUs?'us':'')+'">'+esc(name)+'</span>';
+  }
+  function matchLine(m){
+    return m.score
+      ? teamSpan(m.home)+' <span class="score">'+esc(m.score)+'</span> '+teamSpan(m.away)
+      : teamSpan(m.home)+' <span class="vs">–</span> '+teamSpan(m.away);
+  }
+  function row(cat, lineHtml, dateText){
+    return '<div class="row"><span class="cat">'+esc(cat)+'</span>'+
+      '<span class="match">'+lineHtml+'</span>'+
+      '<span class="date">'+esc(dateText)+'</span></div>';
+  }
+  function emptyRow(cat, text){
+    return '<div class="row"><span class="cat">'+esc(cat)+'</span><span class="empty">'+text+'</span></div>';
+  }
+
+  // Poslední zápasy: most recent match with a score, per category
+  var lastRows = DATA.map(function(cat){
+    var played = cat.matches.filter(function(m){ return m.score; });
+    if(!played.length) return emptyRow(cat.name, 'žádné odehrané zápasy');
+    var m = played[played.length - 1];
+    var d = new Date(m.date);
+    return row(cat.name, matchLine(m), fmtDateTime(d));
+  });
+  document.getElementById('last-list').innerHTML = lastRows.join('');
+
+  // Týdenní přehled
+  var offset = 0;
+  function mondayOf(date){
+    var d = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+    var day = d.getDay();
+    var diff = day === 0 ? -6 : 1 - day;
+    d.setDate(d.getDate() + diff);
+    return d;
+  }
+  function weekBounds(){
+    var start = mondayOf(new Date());
+    start.setDate(start.getDate() + offset*7);
+    var end = new Date(start);
+    end.setDate(end.getDate()+7);
+    return {start:start, end:end};
+  }
+  function renderWeek(){
+    var b = weekBounds();
+    var endInclusive = new Date(b.end.getTime()-1);
+    document.getElementById('week-label').textContent =
+      (offset===0 ? 'Tento týden ' : '') + fmtDate(b.start) + ' – ' + fmtDate(endInclusive);
+
+    var rows = [];
+    DATA.forEach(function(cat){
+      var matches = cat.matches.filter(function(m){
+        var d = new Date(m.date);
+        return d >= b.start && d < b.end;
+      });
+      if(!matches.length){
+        rows.push(emptyRow(cat.name, 'v tomto týdnu se nehraje'));
+      } else {
+        matches.forEach(function(m){
+          var d = new Date(m.date);
+          rows.push(row(cat.name, matchLine(m), fmtDateTime(d)));
+        });
+      }
+    });
+    document.getElementById('week-list').innerHTML = rows.join('');
+  }
+  document.getElementById('prev').addEventListener('click', function(){ offset -= 1; renderWeek(); });
+  document.getElementById('next').addEventListener('click', function(){ offset += 1; renderWeek(); });
+  renderWeek();
+})();
+</script>
